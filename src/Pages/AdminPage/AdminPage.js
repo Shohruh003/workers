@@ -5,7 +5,7 @@ import Header from "../../Components/Header/Header";
 
 function AdminPage() {
     return (
-      <div className="adminPage">
+      <div style={{position: 'fixed', width: "100%"}}>
         <Header/>
         <AdminComponent/>
       </div>

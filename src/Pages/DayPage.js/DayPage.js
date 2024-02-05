@@ -4,7 +4,7 @@ import Header from "../../Components/Header/Header";
 
 function DayPage() {
     return (
-      <div className="dayPage">
+      <div style={{position: 'fixed', width: "100%"}}>
         <Header/>
         <DayComponent/>
       </div>

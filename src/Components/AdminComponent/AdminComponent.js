@@ -4,6 +4,10 @@ import { Table, TableBody, TableCell, TableHead, TableRow, Paper, TableContainer
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useEffect } from 'react';
+import api from '../Api/Api';
+import { useState } from 'react';
+import axios from 'axios';
 const columns = [
     { id: 'id', label: '#', minWidth: 10 },
   { id: 'image', label: 'Фото', minWidth: 50 },
@@ -58,6 +62,7 @@ const rows = [
 export default function AdminComponent() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [users, setUsers] = useState()
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -68,9 +73,55 @@ export default function AdminComponent() {
     setPage(0);
   };
 
+  // useEffect(() => {
+  //   const fetchPupils = async () => {
+  //     try {
+  //       const params = {};
+  //       // if (ageRange) {
+  //       //   params.age_range = ageRange;
+  //       // }
+  //       // if (pupilClass) {
+  //       //   params.search = pupilClass;
+  //       // }
+  //       // if (genders.length > 0) {
+  //       //   params.gender = genders.join(',');
+  //       // }
+  //       // if (pupilEmotion) {
+  //       //   params.filter_by_emotion = pupilEmotion
+  //       // }
+
+  //       let page = 1;
+  //   let allData = [];
+
+  //   while (true) {
+  //     const response = await api.get(`/Workers/?page=${page}`,{ params
+  //        });
+  //     const data = response?.data?.results;
+      
+  //     allData = allData.concat(data);
+  //     page++;
+  //     setUsers(allData)
+  //   }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+  //   fetchPupils();
+  // }, [setUsers]);
+
+  useEffect(() => {
+    api.get('/Workers/')
+    .then((result) => {
+      console.log(result.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, [])
+
+  console.log(users);
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: '540px', height: 'auto'}}>
+    <Paper sx={{ width: '100%', overflow: 'hidden', maxHeight: '100vh', height: '100vh' }}>
+      <TableContainer sx={{ maxHeight: 'calc(100vh - 120px)', height: 'calc(100vh - 120px)' }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>

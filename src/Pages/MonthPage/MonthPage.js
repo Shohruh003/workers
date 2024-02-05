@@ -4,7 +4,7 @@ import MonthComponent from "../../Components/MonthComponent/MonthComponent";
 
 function MonthPage() {
     return (
-      <div className="monthPage">
+      <div style={{position: 'fixed', width: "100%"}}>
         <Header/>
         <MonthComponent/>
       </div>

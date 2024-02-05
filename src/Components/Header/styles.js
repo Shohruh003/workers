@@ -45,6 +45,12 @@ const styles = {
         justifyContent: 'space-between',
         color: '#F5F5F5'
     },
+    genderFilter: {
+      display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        color: '#F5F5F5'
+    },
     timeFilterText: {
         marginRight: '5px',
         color: '#F5F5F5'

@@ -58,8 +58,8 @@ export default function DayComponent() {
   };
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: '540px', height: 'auto'}}>
+    <Paper sx={{ width: '100%', overflow: 'hidden', maxHeight: '100vh', height: '100vh' }}>
+      <TableContainer sx={{ maxHeight: 'calc(100vh - 120px)', height: 'calc(100vh - 120px)' }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>

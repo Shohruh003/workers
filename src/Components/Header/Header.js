@@ -1,7 +1,7 @@
 import { Box, Button, Checkbox, TextField } from "@mui/material";
 import styles from "./styles"
 import dayjs from 'dayjs';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
@@ -39,7 +39,7 @@ function Header() {
           <TextField id="outlined-basic" label="Глобальный поиск" size="small" variant="outlined" />
         </Box>
 
-          <Box sx={isAdminEndpoint() ? styles.timeFilter : styles.adminHeader}>
+          <Box sx={isAdminEndpoint() ? styles.genderFilter : styles.adminHeader}>
               <span style={{fontWait: 700}}>по полу:</span>
               <Checkbox {...label} color="default" sx={{color: "#F5F5F5"}} />
               <span style={{fontWait: 700}}>М</span>
@@ -48,7 +48,7 @@ function Header() {
           </Box>
          </Box>
 
-    <Box sx={styles.timeFilter} style={isAdminEndpoint() ? { display: 'none' } : null}>
+    <Box sx={isAdminEndpoint() ? styles.adminHeader : styles.timeFilter}>
             <Box sx={styles.timeFilterText}>Фильтр по: времени</Box>
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -86,7 +86,7 @@ function Header() {
         <NavLink style={isMonthEndpoint() ? {textDecoration: 'none',color: "#F5F5F5", fontWait: 700, borderBottom: '2px solid red', padding: '20px 0'} : {textDecoration: 'none', color: "#B2D8FF", fontWait: 700, padding: '20px 0'}} to='/month'>За месяц</NavLink>
     </Box>
 
-    <Box sx={isAdminEndpoint() ? styles.adminHeader : styles.timeFilter}>
+    <Box sx={isAdminEndpoint() ? styles.adminHeader : styles.genderFilter}>
         <span style={{fontWait: 700}}>по полу:</span>
         <Checkbox {...label} color="default" sx={{color: "#F5F5F5"}} />
         <span style={{fontWait: 700}}>М</span>
