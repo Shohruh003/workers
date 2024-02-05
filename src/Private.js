@@ -4,16 +4,15 @@ import DayPage from "./Pages/DayPage.js/DayPage";
 import MonthPage from "./Pages/MonthPage/MonthPage";
 
 
-function App() {
-  return (
-    <>
-    <Routes>
-        <Route path="/admin*" element={<AdminPage/>} />
-        <Route path="/*" element={<DayPage/>} />
+function Private () {
+
+     <div>
+      <Routes>
+        <Route path="/*" element={<AdminPage/>} />
+        <Route path="/day/*" element={<DayPage/>} />
         <Route path="/month/*" element={<MonthPage/>} />
       </Routes>
-      </>
-  );
+      </div>
 }
 
-export default App;
+export default Private;
