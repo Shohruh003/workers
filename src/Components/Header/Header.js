@@ -5,13 +5,22 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import React from "react";
+import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { DatePicker, renderTimeViewClock } from "@mui/x-date-pickers";
+import { useContext } from "react";
+import { UserContext } from "../../Context/UserContext";
+import api from "../Api/Api";
+import { useState } from "react";
+import * as XLSX from 'xlsx';
+import AddUsersModal from "../Modal/AddUsersModal";
 
 function Header() {
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+    const {search, setSearch, genders, setGenders, setUsers, setMonth, setInDate, changeRows} = useContext(UserContext)
+    const [addUsersModal, setAddUsersModal] = useState(false)
+
 
     const isAdminEndpoint = () => {
       const currentPath = window.location.pathname;
@@ -27,6 +36,124 @@ function Header() {
       const currentPath = window.location.pathname;
       return currentPath.endsWith('/month');
     };
+
+    const handleSearchChange = (event) => {
+      const searchTerm = event.target.value;
+      console.log(searchTerm);
+      setSearch(searchTerm);
+    };
+
+    const handleGenderChange = (event) => {
+      const target = event.target;
+      const checkboxValue = target.value;
+      const isChecked = target.checked;
+    
+      setGenders((prevGenders) => {
+        if (isChecked) {
+          return [...prevGenders, checkboxValue];
+        } else {
+          return prevGenders.filter((gender) => gender !== checkboxValue);
+        }
+      });
+    };
+    const [firstDayOfMonth, setFirstDayOfMonth] = useState('');
+    const [lastDayOfMonth, setLastDayOfMonth] = useState('');
+    const handleDateChange = (values) => {
+      const year = values.format('YYYY');
+      const month = (values.month() + 1).toString().padStart(2, '0');
+      const daysInMonth = dayjs(`${year}-${month}`).daysInMonth();
+  
+      setInDate(`${year}-${month}`);
+      setFirstDayOfMonth(`${year}-${month}-01`);
+      setLastDayOfMonth(`${year}-${month}-${daysInMonth}`);
+      setMonth(daysInMonth);
+    };
+
+    const [startTime, setStartTime] = useState('')
+    const [endTime, setEndTime] = useState('')
+    const handleTimeChange1 = (values) => {
+      setStartTime(values.format('HH:mm:ss'))
+    }
+    const handleTimeChange2 = (values) => {
+      setEndTime(values.format('HH:mm:ss'))
+    }
+
+    const handleAddUsers = () => {
+      setAddUsersModal(true)
+    }
+  
+    useEffect(() => {
+      const newDate = dayjs();
+      const currentYear = newDate.format('YYYY');
+      const currentMonth = (newDate.month() + 1).toString().padStart(2, '0');
+      const daysInCurrentMonth = dayjs(`${currentYear}-${currentMonth}`).daysInMonth();
+  
+      setFirstDayOfMonth(`${currentYear}-${currentMonth}-01`);
+      setLastDayOfMonth(`${currentYear}-${currentMonth}-${daysInCurrentMonth}`);
+    }, []);
+
+    
+
+    useEffect(() => {
+      const isMonthPage = window.location.pathname.endsWith('/month');
+
+      const fetchPupils = async () => {
+        try {
+          const params = {};
+          if (search) {
+            params.search = search;
+          }
+          if (genders && genders.length > 0) {
+            params.gender = genders.join(',');
+          }
+          if (isMonthPage) {
+            if (firstDayOfMonth) {
+              params.event_date_gt = firstDayOfMonth;
+            }
+  
+            if (lastDayOfMonth) {
+              params.event_date_lt = lastDayOfMonth;
+            }
+          }
+
+            if (startTime) {
+              params.event_time_gte = startTime;
+            }
+  
+            if (endTime) {
+              params.event_time_lte = endTime;
+            }
+  
+          let page = 1;
+      let allData = [];
+  
+      while (true) {
+        const response = await api.get(`/Workers/?page=${page}`,{ params
+          });
+        const data = response?.data?.results;
+        
+        allData = allData.concat(data);
+        page++;
+        setUsers(allData)
+      }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchPupils();
+    }, [search,setUsers,genders, firstDayOfMonth, lastDayOfMonth, startTime, endTime]);
+    const exportToExcel = () => {
+      const ws = XLSX.utils.json_to_sheet(changeRows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      const fileName = 'exported_data.xlsx';
+      XLSX.writeFile(wb, fileName);
+    };
+
+    const currentDate = dayjs();
+    const todayStart = currentDate.startOf('day').format('YYYY-MM-DDTHH:mm');
+    const tomorrowEnd = currentDate.add(1, 'day').startOf('day').subtract(1, 'minute').format('YYYY-MM-DDTHH:mm');
+
     return (
       <Box sx={styles.header}>
          <Box sx={styles.headerSearch}>
@@ -36,14 +163,32 @@ function Header() {
           noValidate
           autoComplete="off"
         >
-          <TextField id="outlined-basic" label="Глобальный поиск" size="small" variant="outlined" />
+          <TextField id="outlined-basic" onChange={handleSearchChange} label="Глобальный поиск" size="small" variant="outlined" />
         </Box>
 
           <Box sx={isAdminEndpoint() ? styles.genderFilter : styles.adminHeader}>
               <span style={{fontWait: 700}}>по полу:</span>
-              <Checkbox {...label} color="default" sx={{color: "#F5F5F5"}} />
+              <Checkbox 
+              {...label}
+              color="default" 
+              sx={{color: "#F5F5F5"}}
+              className="radio_button"
+              id="maleCheckbox"
+              type="checkbox"
+              checked={genders?.includes("true")}
+              onChange={handleGenderChange}
+              value="true" />
               <span style={{fontWait: 700}}>М</span>
-              <Checkbox {...label} color="default" sx={{color: "#F5F5F5"}} />
+              <Checkbox 
+              {...label} 
+              color="default" 
+              sx={{color: "#F5F5F5"}}
+              className="radio_button"
+              id="femaleCheckbox"
+              type="checkbox"
+              checked={genders?.includes("false")}
+              onChange={handleGenderChange}
+              value="false" />
               <span style={{fontWait: 700}}>Ж</span>
           </Box>
          </Box>
@@ -53,11 +198,13 @@ function Header() {
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               {isMonthEndpoint() ?  <DemoContainer components={['DatePicker', 'DatePicker', 'DatePicker']}>
-        <DatePicker 
-         sx={styles.timePicker}
-         slotProps={{ textField: { size: 'small' } }}
+              <DatePicker
+        sx={styles.timePicker}
+        slotProps={{ textField: { size: 'small' } }}
         views={['month', 'year']}
-        defaultValue={dayjs('2022-04-17T15:30')}/>
+        defaultValue={dayjs()}
+        onChange={handleDateChange}
+      />
       </DemoContainer> : <DemoContainer components={['TimePicker', 'TimePicker']}>
               <TimePicker
         sx={styles.timePicker}
@@ -66,7 +213,8 @@ function Header() {
             hours: renderTimeViewClock,
             minutes: renderTimeViewClock,
           }}
-          defaultValue={dayjs('2022-04-17T15:30')}
+          defaultValue={dayjs(todayStart)}
+          onChange={handleTimeChange1}
         />
                        <TimePicker
         sx={styles.timePicker}
@@ -75,7 +223,8 @@ function Header() {
             hours: renderTimeViewClock,
             minutes: renderTimeViewClock,
           }}
-          defaultValue={dayjs('2022-04-17T15:30')}
+          defaultValue={dayjs(tomorrowEnd)}
+          onChange={handleTimeChange2}
         />
               </DemoContainer>}
               
@@ -88,16 +237,36 @@ function Header() {
 
     <Box sx={isAdminEndpoint() ? styles.adminHeader : styles.genderFilter}>
         <span style={{fontWait: 700}}>по полу:</span>
-        <Checkbox {...label} color="default" sx={{color: "#F5F5F5"}} />
-        <span style={{fontWait: 700}}>М</span>
-        <Checkbox {...label} color="default" sx={{color: "#F5F5F5"}} />
+        <Checkbox 
+              {...label}
+              color="default" 
+              sx={{color: "#F5F5F5"}}
+              className="radio_button"
+              id="maleCheckbox"
+              type="checkbox"
+              checked={genders?.includes("true")}
+              onChange={handleGenderChange}
+              value="true" />
+              <span style={{fontWait: 700}}>М</span>
+              <Checkbox 
+              {...label} 
+              color="default" 
+              sx={{color: "#F5F5F5"}}
+              className="radio_button"
+              id="femaleCheckbox"
+              type="checkbox"
+              checked={genders?.includes("false")}
+              onChange={handleGenderChange}
+              value="false" />
         <span style={{fontWait: 700}}>Ж</span>
     </Box>
 
-    {isAdminEndpoint() ? <Button sx={styles.headerButton} variant="contained" color="success">
+    <AddUsersModal addUsersModal={addUsersModal} setAddUsersModal={setAddUsersModal}/>
+
+    {isAdminEndpoint() ? <Button onClick={handleAddUsers} sx={styles.headerButton} variant="contained" color="success">
     <span style={{marginRight: '5px'}}>Добавить</span>
     <AddCircleIcon/>
-      </Button> :     <Button sx={styles.headerButton} variant="contained" color="success">
+      </Button> :     <Button sx={styles.headerButton} onClick={exportToExcel} variant="contained" color="success">
     <span style={{marginRight: '5px'}}>Экспорт в  xls</span>
     <svg xmlns="http://www.w3.org/2000/svg" fill="#F5F5F5" x="0px" y="0px" width="30" height="30" viewBox="0 0 50 50"
 >
@@ -105,9 +274,7 @@ function Header() {
 </svg>
     
       </Button>}
-
-
-
+      
       </Box>
 
     );

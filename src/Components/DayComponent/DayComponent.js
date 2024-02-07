@@ -2,6 +2,11 @@
 import * as React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, Paper, TableContainer, TablePagination, Button } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useContext } from 'react';
+import { UserContext } from '../../Context/UserContext';
+import { useState } from 'react';
+import dayjs from 'dayjs';
+import { useEffect } from 'react';
 const columns = [
     { id: 'id', label: '#', minWidth: 10 },
   { id: 'image', label: 'Фото', minWidth: 50 },
@@ -22,31 +27,31 @@ function createData(id, image, name, firstTime, lastTime) {
   return {id, image, name, firstTime, lastTime };
 }
 
-const rows = [
-  createData(1, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(2, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(3, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-  createData(4, 'img', 'Shohruh Azimov', '09:00', '18:00'),
-];
-
 export default function DayComponent() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const { users, setChangeRows } = useContext(UserContext);
+
+  const currentDate = dayjs();
+  const currentDateString = currentDate.format('YYYY-MM-DD');
+
+  const rows = users?.map((user, index) => {
+    const { image, full_name, events } = user;
+    const firstEventTime = events[currentDateString]?.first || '-:-';
+    const lastEventTime = events[currentDateString]?.last || '-:-';
+
+    return createData(
+      index + 1,
+      <img src={image} alt="User" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />,
+      full_name,
+      firstEventTime.split(':').slice(0, 2).join(':'),
+      lastEventTime.split(':').slice(0, 2).join(':'), 
+    );
+  }) || [];
+
+  useEffect(() => {
+    setChangeRows(rows)
+  })
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

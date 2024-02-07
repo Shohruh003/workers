@@ -61,6 +61,7 @@ const styles = {
     headerButton: {
       display: 'flex',
       alignItems: 'center',
+      zIndex: 1
     },
   }
   

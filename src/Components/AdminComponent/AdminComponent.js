@@ -4,10 +4,10 @@ import { Table, TableBody, TableCell, TableHead, TableRow, Paper, TableContainer
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useEffect } from 'react';
-import api from '../Api/Api';
 import { useState } from 'react';
-import axios from 'axios';
+import { useContext } from 'react';
+import { UserContext } from '../../Context/UserContext';
+import DeleteModal from '../Modal/DeleteModal';
 const columns = [
     { id: 'id', label: '#', minWidth: 10 },
   { id: 'image', label: 'Фото', minWidth: 50 },
@@ -43,26 +43,14 @@ function createData(id, image, name, phone, gmail, position, editIcon, deleteIco
   return {id, image, name, phone, gmail, position, editIcon, deleteIcon};
 }
 
-const rows = [
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),
-  createData(1, 'img', 'Shohruh Azimov', '+998942720705', 'shohruhazimov0705@gmail.com', 'developer', <EditIcon sx={{zIndex: 1000, cursor: 'pointer'}}/> ,<DeleteIcon sx={{zIndex: 1000, cursor: 'pointer'}}/>),  
-];
+
 
 export default function AdminComponent() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [users, setUsers] = useState()
+  const { users, setUserIds } = useContext(UserContext)
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [open, setOpen] = useState(false)
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -72,55 +60,26 @@ export default function AdminComponent() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-
-  // useEffect(() => {
-  //   const fetchPupils = async () => {
-  //     try {
-  //       const params = {};
-  //       // if (ageRange) {
-  //       //   params.age_range = ageRange;
-  //       // }
-  //       // if (pupilClass) {
-  //       //   params.search = pupilClass;
-  //       // }
-  //       // if (genders.length > 0) {
-  //       //   params.gender = genders.join(',');
-  //       // }
-  //       // if (pupilEmotion) {
-  //       //   params.filter_by_emotion = pupilEmotion
-  //       // }
-
-  //       let page = 1;
-  //   let allData = [];
-
-  //   while (true) {
-  //     const response = await api.get(`/Workers/?page=${page}`,{ params
-  //        });
-  //     const data = response?.data?.results;
-      
-  //     allData = allData.concat(data);
-  //     page++;
-  //     setUsers(allData)
-  //   }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-  //   fetchPupils();
-  // }, [setUsers]);
-
-  useEffect(() => {
-    api.get('/Workers/')
-    .then((result) => {
-      console.log(result.data);
-    }).catch((err) => {
-      console.log(err);
-    });
-  }, [])
-
-  console.log(users);
+  const handleOpen = (userId) => {
+    setOpen(true);
+    setUserIds(userId)
+  };
+  const rows = users?.map((e, index) => createData(
+    index + 1,
+    <img src={e?.image} alt="User" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />,
+    e?.full_name,
+    e?.phone_number,
+    e?.email,
+    e?.status,
+    <EditIcon sx={{ zIndex: 1000, cursor: 'pointer' }} />,
+    <DeleteIcon
+      sx={{ zIndex: 1000, cursor: 'pointer' }}
+      onClick={() => handleOpen(e?.id)}
+    />
+  )) || [];
+  
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden', maxHeight: '100vh', height: '100vh' }}>
+<Paper sx={{ width: '100%', overflow: 'hidden', maxHeight: '100vh', height: '100vh' }}>
       <TableContainer sx={{ maxHeight: 'calc(100vh - 120px)', height: 'calc(100vh - 120px)' }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -172,6 +131,7 @@ export default function AdminComponent() {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+      <DeleteModal open={open} setOpen={setOpen} />
     </Paper>
   );
 }

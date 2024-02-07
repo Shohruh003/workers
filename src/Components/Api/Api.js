@@ -1,8 +1,21 @@
 import axios from 'axios';
-
 const api = axios.create({
-  baseURL: 'http://workers-back.tadi.uz/api',
-});
+    baseURL: 'http://workers-back.tadi.uz/api',
+  });
+  
+  api.interceptors.request.use(
+    (config) => {
+      config.headers.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzA3NzM0MzQ2LCJpYXQiOjE3MDczMDIzNDYsImp0aSI6ImE1M2RiNWI1MGY0ZDRjYzliMDg0NTBhOTBiMmI0MzQ3IiwidXNlcl9pZCI6MX0.CF7UJIChB2TrNH-r2tiU3vyp5Wa5ddstsfSe8Yg07ug`;
+
+      return config;
+    },
+    async (error) => {
+          return Promise.reject(error);
+        }
+  )
+// const api = axios.create({
+//   baseURL: 'https://mycorse.onrender.com/http://workers-back.tadi.uz/api',
+// });
 
 // api.interceptors.request.use(
 //   (config) => {
