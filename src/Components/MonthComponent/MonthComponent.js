@@ -18,6 +18,7 @@ const MonthComponent = () => {
     { id: 'image', label: 'Фото', minWidth: 50 },
     { id: 'name', label: 'Фамилия и имя', minWidth: 170 },
     ...Array.from({ length: months }, (_, i) => ({ id: `day${i + 1}`, label: `${i + 1}`, minWidth: 10 })),
+    { id: 'total', label: 'Всего', minWidth: 10 },
   ];
 
   function createData(id, image, name, ...days) {
@@ -25,6 +26,7 @@ const MonthComponent = () => {
     days.forEach((day, index) => {
       rowData[`day${index + 1}`] = day || '';
     });
+    rowData['total'] = days[days.length - 1];
     return rowData;
   }
 
@@ -50,7 +52,8 @@ const MonthComponent = () => {
       index + 1,
       <img src={e?.image} alt="User" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />,
       e?.full_name,
-      ...userEvents
+      ...userEvents,
+      (e?.events?.total_late_time / 60).toFixed(1)
     );
   }) || [];
 
@@ -79,9 +82,9 @@ useEffect(() => {
           <TableBody>
             {rows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
+              .map((row, index) => {
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                  <TableRow hover role="checkbox" tabIndex={-1} key={index}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (

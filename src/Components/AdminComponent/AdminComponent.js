@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useContext } from 'react';
 import { UserContext } from '../../Context/UserContext';
 import DeleteModal from '../Modal/DeleteModal';
+import EditUsersModal from '../Modal/EditUserModal';
 const columns = [
     { id: 'id', label: '#', minWidth: 10 },
   { id: 'image', label: 'Фото', minWidth: 50 },
@@ -50,7 +51,8 @@ export default function AdminComponent() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false)
-
+  const [editUsersModal, setEditUsersModal] = useState(false)
+  const [editUsers, setEditUsers] = useState(false)
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -64,6 +66,11 @@ export default function AdminComponent() {
     setOpen(true);
     setUserIds(userId)
   };
+
+  const handleEditUser = (user) => {
+    setEditUsersModal(true)
+    setEditUsers(user)
+  }
   const rows = users?.map((e, index) => createData(
     index + 1,
     <img src={e?.image} alt="User" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />,
@@ -71,7 +78,7 @@ export default function AdminComponent() {
     e?.phone_number,
     e?.email,
     e?.status,
-    <EditIcon sx={{ zIndex: 1000, cursor: 'pointer' }} />,
+    <EditIcon sx={{ zIndex: 1000, cursor: 'pointer' }} onClick={() => handleEditUser(e)}/>,
     <DeleteIcon
       sx={{ zIndex: 1000, cursor: 'pointer' }}
       onClick={() => handleOpen(e?.id)}
@@ -98,9 +105,9 @@ export default function AdminComponent() {
           <TableBody>
             {rows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
+              .map((row, index) => {
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                  <TableRow hover role="checkbox" tabIndex={-1} key={index}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
@@ -132,6 +139,7 @@ export default function AdminComponent() {
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
       <DeleteModal open={open} setOpen={setOpen} />
+      <EditUsersModal editUsersModal={editUsersModal} setEditUsersModal={setEditUsersModal} editUsers={editUsers} setEditUsers={setEditUsers} />
     </Paper>
   );
 }

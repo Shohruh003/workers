@@ -137,7 +137,7 @@ function Header() {
         setUsers(allData)
       }
         } catch (error) {
-          console.error(error);
+          return
         }
       };
       fetchPupils();
